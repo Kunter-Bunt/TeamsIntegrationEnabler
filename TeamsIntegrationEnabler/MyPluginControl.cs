@@ -46,12 +46,12 @@ namespace TeamsIntegrationEnabler
 
         private void tsbEnable_Click(object sender, EventArgs e)
         {
-            ExecuteMethod(() => changeTeamsIntegrationStatus(true));
+            ExecuteMethod(EnableTeamsIntegration);
         }
 
         private void tsbDisable_Click(object sender, EventArgs e)
         {
-            ExecuteMethod(() => changeTeamsIntegrationStatus(false));
+            ExecuteMethod(DisableTeamsIntegration);
         }
 
         private void tsbLoadTables_Click(object sender, EventArgs e)
@@ -59,9 +59,18 @@ namespace TeamsIntegrationEnabler
             ExecuteMethod(LoadTables);
         }
 
-        private void changeTeamsIntegrationStatus(bool enable)
+        private void EnableTeamsIntegration() => ChangeTeamsIntegrationStatus(true);
+        private void DisableTeamsIntegration() => ChangeTeamsIntegrationStatus(false);
+
+        private void ChangeTeamsIntegrationStatus(bool enable)
         {
             var selectedItems = lbTables.SelectedItems;
+            if (selectedItems.Count == 0)
+            {
+                MessageBox.Show("Please select a table first", "Info", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             var tableNames = "[";
             foreach (var item in selectedItems)
             {
@@ -151,6 +160,9 @@ namespace TeamsIntegrationEnabler
                 Message = "Loading table metadata",
                 Work = (worker, args) =>
                 {
+                    if (Service == null)
+                        return;
+
                     RetrieveAllEntitiesRequest retrieveAllEntityRequest = new RetrieveAllEntitiesRequest
                     {
                         RetrieveAsIfPublished = true,

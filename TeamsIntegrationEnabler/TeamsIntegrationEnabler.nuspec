@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>TeamsIntegrationEnabler</id>
+    <version>1.0.0.0</version>
+    <title>Teams Integration Enabler</title>
+    <authors>Marius Wodtke</authors>
+    <owners></owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectUrl>https://github.com/Kunter-Bunt/TeamsIntegrationEnabler</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/Kunter-Bunt/TeamsIntegrationEnabler/refs/heads/main/TeamsIntegrationEnabler/Resources/people_team_add.png</iconUrl>
+    <description>Enable the Teams Collaboration Feature for custom tables.</description>
+    <tags>Configuration Customizations</tags>
+    <dependencies>
+      <dependency id="XrmToolBox" version="1.2025.10.74" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\TeamsIntegrationEnabler.dll" target="lib\net48\Plugins\TeamsIntegrationEnabler.dll" />
+  </files>
+</package>
