@@ -5,11 +5,11 @@ You can disable these preset tables as well as enable it for custom tables and m
 
 ## Step by step
 1. Load the tables and find the table you are looking to enable/disable. There is a search box at the top to help you.
-![](images/Step1.jpg)
+![images/Step1.jpg](images/Step1.jpg)
 1. Now use the _Enable/Disable_ buttons to change the status of the Teams Integration for the given table.
-![](images/Step2.jpg)
+![images/Step2.jpg](images/Step2.jpg)
 1. After reloading, the colorcoding will show you the current status of the feature. (**Please check the know issues section!**)
-![](images/Step3.jpg)
+![images/Step3.jpg](images/Step3.jpg)
 1. If you chose to enable the Teams Feature for a table and as a whole in _Chat and Collaborate_ you should now find the _Collaborate_ button in the ribbon of a form for existing records of that table. If you don't, make sure to use clear cache refresh, Publish all Customization and Regenerate Ribbon Metadata; as usual the ribbon might be stubborn to update its contents.
 1. If you have the table in question in a solution with _Include table metadata_ enabled, the status of the Teams Integration will be transported to other environments with the solution. 
 
