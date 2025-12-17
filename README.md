@@ -3,6 +3,10 @@ In the _Sales Hub_ App, _App Settings_, _Chat and Collaborate_, you will find th
 
 You can disable these preset tables as well as enable it for custom tables and many OOTB tables [with Web API requests](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/developer/integration-dev/teams-integration-using-code). Since this requires extra tools and additional preparation time, this tool shall help you to perform these actions more easily.
 
+## Prerequisites
+- You need to have the solution `msdynce_OfficeProductivity` installed in your environment. This solution seems to be preinstalled if either Customer Service, Sales or Marketing apps are installed. 
+- Make sure to turn on _Turn on linking of Dynamics 365 records to Microsoft Teams channels_, for example in _Sales Hub_ App, _App Settings_, _Chat and Collaborate_. This will ensure the feature itself is active as well as enabled the standard set of tables.
+
 ## Step by step
 1. Load the tables and find the table you are looking to enable/disable. There is a search box at the top to help you.
 ![images/Step1.jpg](images/Step1.jpg)

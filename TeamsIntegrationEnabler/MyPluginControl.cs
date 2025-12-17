@@ -88,69 +88,85 @@ namespace TeamsIntegrationEnabler
                         ["LogicalEntityNames"] = tableNames,
                         ["Enable"] = enable
                     };
-                    var response = Service.Execute(request);
-                    args.Result = response;
+                    try
+                    {
+                        var response = Service.Execute(request);
+                        args.Result = response;
+                    }
+                    catch (Exception ex)
+                    {
+                        args.Result = new OrganizationResponse
+                        {
+                            ["OperationResult"] = false,
+                            ["PassedLogicalEntityNames"] = string.Empty,
+                            ["FailedLogicalEntityNames"] = tableNames,
+                            ["ErrorMessage"] = ex.Message
+                        };
+                    }
                 },
                 PostWorkCallBack = (args) =>
                 {
                     var response = args.Result as OrganizationResponse;
-                    bool? operationResult = response?["OperationResult"] as bool?;
-                    var passedLogicalEntityNames = response?["PassedLogicalEntityNames"] as string;
-                    var failedLogicalEntityNames = response?["FailedLogicalEntityNames"] as string;
+                    response.Results.TryGetValue<bool?>("OperationResult", out var operationResult);
+                    response.Results.TryGetValue<string>("PassedLogicalEntityNames", out var passedLogicalEntityNames);
+                    response.Results.TryGetValue<string>("FailedLogicalEntityNames", out var failedLogicalEntityNames);
+                    response.Results.TryGetValue<string>("ErrorMessage", out var errorMessage);
 
-                    // Update status label
-                    if (operationResult.GetValueOrDefault())
+                    SetOutcomeLabelsAndRefresh(enable, operationResult, passedLogicalEntityNames, failedLogicalEntityNames, errorMessage);
+
+                    if (operationResult == true)
                     {
-                        lblResultStatus.Text = "SUCCESS";
-                        lblResultStatus.ForeColor = Color.ForestGreen;
+                        var res = MessageBox.Show("Operation completed. Refresh Tables?", "Info", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                        if (res == DialogResult.Yes)
+                            LoadTables();
                     }
-                    else
+                    else if (errorMessage?.Contains("Request not supported") == true)
                     {
-                        lblResultStatus.Text = "FAILURE";
-                        lblResultStatus.ForeColor = Color.Firebrick;
+                        var res = MessageBox.Show("It seems like the SetTeamsDocumentStatus action does not exist on the environment, did you turn on linking of Dynamics 365 records to Microsoft Teams channels?", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
-
-                    string verb = enable ? "enabled" : "disabled";
-
-                    // Format messages: parse the stringified arrays like "[account,contact]" or "[]"
-                    string FormatTablesMessage(string names)
-                    {
-                        if (string.IsNullOrWhiteSpace(names)) return string.Empty;
-                        var trimmed = names.Trim();
-                        if (trimmed.StartsWith("[") && trimmed.EndsWith("]"))
-                        {
-                            trimmed = trimmed.Substring(1, trimmed.Length - 2); // remove [ ]
-                        }
-                        // Split by comma and trim items; handle empty string -> no tables
-                        var parts = trimmed.Length == 0 ? new string[0] : trimmed.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(p => p.Trim()).ToArray();
-                        return string.Join(", ", parts);
-                    }
-
-                    var passedList = FormatTablesMessage(passedLogicalEntityNames);
-                    var failedList = FormatTablesMessage(failedLogicalEntityNames);
-
-                    lblPassedMsg.ForeColor = Color.ForestGreen;
-                    lblFailedMsg.ForeColor = Color.Firebrick;
-
-                    lblPassedMsg.Text = string.IsNullOrEmpty(passedList)
-                        ? string.Empty
-                        : $"Successfully {verb} Teams Integration for {passedList}";
-
-                    lblFailedMsg.Text = string.IsNullOrEmpty(failedList)
-                        ? string.Empty
-                        : $"Failed to {verb} Teams Integration for {failedList}";
-
-                    // Refresh UI
-                    lblResultStatus.Invalidate();
-                    lblPassedMsg.Invalidate();
-                    lblFailedMsg.Invalidate();
-
-                    var res = MessageBox.Show("Operation completed. Refresh Tables?", "Info", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
-                    if (res == DialogResult.Yes)
-                        LoadTables();
                 }
             });
+        }
 
+        private void SetOutcomeLabelsAndRefresh(bool enable, bool? operationResult, string passedLogicalEntityNames, string failedLogicalEntityNames, string errorMessage)
+        {
+            if (operationResult == true)
+            {
+                lblResultStatus.Text = "SUCCESS";
+                lblResultStatus.ForeColor = Color.ForestGreen;
+            }
+            else
+            {
+                lblResultStatus.Text = "FAILURE";
+                lblResultStatus.ForeColor = Color.Firebrick;
+            }
+
+            string verb = enable ? "enabled" : "disabled";
+
+            var passedList = FormatTablesMessage(passedLogicalEntityNames);
+            var failedList = FormatTablesMessage(failedLogicalEntityNames);
+
+            lblPassedMsg.ForeColor = Color.ForestGreen;
+            lblFailedMsg.ForeColor = Color.Firebrick;
+
+            lblPassedMsg.Text = string.IsNullOrEmpty(passedList)
+                ? string.Empty
+                : $"Successfully {verb} Teams Integration for {passedList}";
+
+            lblFailedMsg.Text = string.IsNullOrEmpty(failedList)
+                ? string.Empty
+                : $"Failed to {verb} Teams Integration for {failedList}: {errorMessage}";
+
+            lblResultStatus.Invalidate();
+            lblPassedMsg.Invalidate();
+            lblFailedMsg.Invalidate();
+        }
+
+        private string FormatTablesMessage(string names)
+        {
+            if (string.IsNullOrWhiteSpace(names)) return string.Empty;
+            var trimmed = names.Trim().Trim('[', ']');
+            return trimmed;
         }
 
         private void LoadTables()
